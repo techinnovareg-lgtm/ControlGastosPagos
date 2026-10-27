@@ -5,11 +5,10 @@ import { Menu, X } from "lucide-react"
 import { Sidebar } from "./sidebar"
 import { usePathname } from "next/navigation"
 
-export function MobileSidebar() {
+export function MobileSidebar({ userRole = "user" }: { userRole?: string }) {
   const [isOpen, setIsOpen] = React.useState(false)
   const pathname = usePathname()
 
-  // Cerrar al cambiar de ruta
   React.useEffect(() => {
     setIsOpen(false)
   }, [pathname])
@@ -26,13 +25,11 @@ export function MobileSidebar() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
-          {/* Backdrop con blur */}
           <div 
             className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Panel Lateral Animado */}
           <div className="relative z-50 flex h-full w-64 flex-col bg-card shadow-2xl animate-in slide-in-from-left duration-300 border-r">
             <button 
               onClick={() => setIsOpen(false)}
@@ -42,8 +39,7 @@ export function MobileSidebar() {
             </button>
             
             <div className="flex-1 overflow-y-auto w-full h-full">
-              {/* Reutilizamos el Sidebar pero ignoramos su border-r nativo porque ya le pusimos wrapper */}
-              <Sidebar />
+              <Sidebar userRole={userRole} />
             </div>
           </div>
         </div>

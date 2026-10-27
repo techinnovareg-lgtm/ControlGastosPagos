@@ -1,6 +1,6 @@
 "use client"
 
-import { LogOut, Bell, AlertTriangle, Clock, Banknote as BankIcon, Check, User, ChevronDown, Settings } from "lucide-react"
+import { LogOut, Bell, AlertTriangle, Clock, Banknote as BankIcon, Check, User, ChevronDown, Settings, ShieldAlert } from "lucide-react"
 import { createClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useNotifications } from "@/hooks/useNotifications"
@@ -13,10 +13,12 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { MobileSidebar } from "./mobile-sidebar"
 
-export function Header({ userName }: { userName: string }) {
+export function Header({ userName, userRole = "user" }: { userName: string; userRole?: string }) {
   const router = useRouter()
   const supabase = createClient()
   const { notifications, hasNewAlerts, markAsRead } = useNotifications()
+
+  const isSuperAdmin = userRole === "superadmin" || userRole === "admin"
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -27,7 +29,7 @@ export function Header({ userName }: { userName: string }) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 px-4 sm:px-6 backdrop-blur-md">
       <div className="flex items-center gap-2 sm:gap-4">
-        <MobileSidebar />
+        <MobileSidebar userRole={userRole} />
         <div className="hidden sm:block">
           <h1 className="text-2xl font-bold tracking-tight">
             Bienvenido de nuevo, <span className="text-indigo-500">{userName}</span>
@@ -40,6 +42,11 @@ export function Header({ userName }: { userName: string }) {
             <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em]">
               Sistema de Control Financiero
             </span>
+            {isSuperAdmin && (
+              <span className="ml-1 text-[9px] uppercase font-black px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                Superadmin
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -121,6 +128,7 @@ export function Header({ userName }: { userName: string }) {
         
         <div className="h-4 w-px bg-border/50"></div>
         
+        {/* Dropdown de Usuario con Acceso Superadmin */}
         <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center gap-2 outline-none p-1.5 rounded-full hover:bg-accent/50 transition-colors">
@@ -133,7 +141,25 @@ export function Header({ userName }: { userName: string }) {
               <ChevronDown className="h-3 w-3 text-muted-foreground" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-48 p-1 z-50 shadow-2xl border-border/50">
+          <PopoverContent align="end" className="w-52 p-1.5 z-50 shadow-2xl border-border/50">
+            {isSuperAdmin && (
+              <>
+                <button 
+                  onClick={() => router.push('/dashboard/admin')}
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm font-bold rounded-md bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors text-left"
+                >
+                  <span className="flex items-center gap-2">
+                    <ShieldAlert className="h-4 w-4 text-purple-400" />
+                    <span>Panel Superadmin</span>
+                  </span>
+                  <span className="text-[9px] uppercase px-1 rounded bg-purple-500/30 text-purple-200">
+                    PIN
+                  </span>
+                </button>
+                <div className="h-px w-full bg-border/50 my-1"></div>
+              </>
+            )}
+
             <button 
               onClick={() => router.push('/dashboard/settings')}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-primary transition-colors text-left text-muted-foreground"
@@ -141,7 +167,9 @@ export function Header({ userName }: { userName: string }) {
               <Settings className="h-4 w-4" />
               <span>Configuración</span>
             </button>
+            
             <div className="h-px w-full bg-border/50 my-1"></div>
+            
             <button 
               onClick={handleSignOut}
               className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors text-left"

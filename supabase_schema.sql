@@ -229,3 +229,22 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER on_saving_contribution_changed
   AFTER INSERT OR DELETE ON public.saving_contributions
   FOR EACH ROW EXECUTE PROCEDURE public.handle_saving_contribution();
+
+
+-- 15. Extensión para Superadmin, Roles y PIN de Seguridad (NovaKey Style)
+ALTER TABLE public.profiles 
+  ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user',
+  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active',
+  ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free',
+  ADD COLUMN IF NOT EXISTS security_pin TEXT DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+CREATE POLICY "Admins can view and manage all profiles"
+  ON public.profiles FOR ALL
+  USING (
+    auth.uid() = id OR 
+    EXISTS (
+      SELECT 1 FROM public.profiles 
+      WHERE id = auth.uid() AND role IN ('admin', 'superadmin')
+    )
+  );
