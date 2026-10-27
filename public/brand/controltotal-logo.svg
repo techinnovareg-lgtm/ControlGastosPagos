@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" fill="none">
+  <defs>
+    <linearGradient id="ctGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="50%" stop-color="#7C3AED" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+    <filter id="ctGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#4F46E5" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Isotipo -->
+  <g filter="url(#ctGlow)">
+    <rect x="6" y="6" width="48" height="48" rx="14" fill="url(#ctGrad)" />
+    <!-- Wallet / Graph Shape -->
+    <path d="M20 22C20 19.7909 21.7909 18 24 18H36C38.2091 18 40 19.7909 40 22V38C40 40.2091 38.2091 42 36 42H24C21.7909 42 20 40.2091 20 38V22Z" fill="white" fill-opacity="0.15" />
+    <path d="M19 25C19 23.3431 20.3431 22 22 22H38C39.6569 22 41 23.3431 41 25V37C41 38.6569 39.6569 40 38 40H22C20.3431 40 19 38.6569 19 37V25Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M26 31L30 35L36 27" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="37" cy="31" r="2" fill="#38BDF8"/>
+  </g>
+
+  <!-- Tipografía ControlTotal -->
+  <text x="66" y="34" font-family="'Outfit', 'Inter', -apple-system, sans-serif" font-size="24" font-weight="800" fill="#0F172A" letter-spacing="-0.5">Control<tspan fill="url(#ctGrad)">Total</tspan></text>
+  <text x="67" y="47" font-family="'Inter', sans-serif" font-size="9" font-weight="600" fill="#64748B" letter-spacing="1.5">BY TECH INNOVA</text>
+</svg>
