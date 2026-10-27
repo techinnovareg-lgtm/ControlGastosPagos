@@ -43,11 +43,13 @@ export default function LoginPage() {
     })
 
     if (authError) {
-      setError(
-        authError.message.includes("Invalid login credentials")
-          ? "Credenciales incorrectas. Verifica tu correo y contraseña."
-          : authError.message
-      )
+      let friendlyMessage = authError.message
+      if (authError.message.includes("Invalid login credentials")) {
+        friendlyMessage = "Credenciales incorrectas. Verifica tu correo y contraseña."
+      } else if (authError.message.includes("Email not confirmed")) {
+        friendlyMessage = "Correo electrónico no confirmado. Por favor confirma tu cuenta desde el correo recibido o contacta a soporte."
+      }
+      setError(friendlyMessage)
       setLoading(false)
       return
     }
