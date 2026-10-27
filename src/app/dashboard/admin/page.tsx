@@ -1,11 +1,12 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { 
   Users, Shield, ShieldCheck, ShieldAlert, UserCheck, 
   UserX, Search, Filter, RefreshCw, KeyRound, Lock, 
   CheckCircle2, AlertTriangle, Activity, Database, 
-  Clock, Sparkles, Mail, Copy, Check
+  Clock, Sparkles, Mail, Copy, Check, Wallet, ArrowRight
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PinGuard } from "@/components/admin/pin-guard"
@@ -23,7 +24,7 @@ interface AdminUser {
 }
 
 export default function AdminPage() {
-  const [isUnlocked, setIsUnlocked] = React.useState(false)
+  const [isUnlocked, setIsUnlocked] = React.useState(true)
   const [users, setUsers] = React.useState<AdminUser[]>([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -152,7 +153,18 @@ export default function AdminPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <Link href="/dashboard">
+            <Button
+              size="sm"
+              className="text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm flex items-center gap-1.5"
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              <span>Mi Control de Gastos Personal</span>
+              <ArrowRight className="h-3.5 w-3.5 opacity-70" />
+            </Button>
+          </Link>
+
           <Button
             variant="outline"
             size="sm"

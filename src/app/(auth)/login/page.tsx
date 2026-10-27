@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { 
   Loader2, Mail, Lock, ArrowRight, ShieldCheck, 
   HelpCircle, CheckCircle2, MessageCircle, ArrowLeft,
-  ChevronDown
+  ChevronDown, KeyRound, ShieldAlert
 } from "lucide-react"
 
 export default function LoginPage() {
@@ -19,6 +19,10 @@ export default function LoginPage() {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   
+  const [inputEmail, setInputEmail] = React.useState("")
+  const [superadminPin, setSuperadminPin] = React.useState("")
+  const [showAdminPinInput, setShowAdminPinInput] = React.useState(false)
+
   // Estado para modal / vista de "Olvidé mi contraseña"
   const [isResetMode, setIsResetMode] = React.useState(false)
   const [resetEmail, setResetEmail] = React.useState("")
@@ -28,16 +32,44 @@ export default function LoginPage() {
   // Estado para menú de soporte
   const [showSupportMenu, setShowSupportMenu] = React.useState(false)
 
+  const isSuperAdminEmail = 
+    inputEmail.toLowerCase().includes("tech.innova.reg@gmail.com") ||
+    inputEmail.toLowerCase().includes("carlos.amambal@gmail.com") ||
+    showAdminPinInput
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
     
     const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
+    const email = (formData.get("email") as string).trim()
     const password = formData.get("password") as string
+    const pin = (formData.get("pin") as string || superadminPin).trim()
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const isSuper = 
+      email.toLowerCase() === "tech.innova.reg@gmail.com" || 
+      email.toLowerCase() === "carlos.amambal@gmail.com"
+
+    // 1. Si es Superadmin, requerir y validar PIN en el LOGIN
+    if (isSuper) {
+      if (!pin) {
+        setShowAdminPinInput(true)
+        setError("Acceso Superadmin detectado: Ingresa tu PIN de autorización de 4 dígitos (Inicial: 2026).")
+        setLoading(false)
+        return
+      }
+
+      // Validar PIN contra 2026 o backend
+      if (pin !== "2026") {
+        setError("PIN de autorización incorrecto. (PIN inicial de respaldo: 2026)")
+        setLoading(false)
+        return
+      }
+    }
+
+    // 2. Iniciar sesión con Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
@@ -54,7 +86,13 @@ export default function LoginPage() {
       return
     }
 
-    router.push("/dashboard")
+    // 3. Redirección inteligente: Superadmin va directo a Administración, usuario regular va al Dashboard
+    if (isSuper) {
+      sessionStorage.setItem("superadmin_pin_verified", "true")
+      router.push("/dashboard/admin")
+    } else {
+      router.push("/dashboard")
+    }
     router.refresh()
   }
 
@@ -83,7 +121,7 @@ export default function LoginPage() {
   return (
     <div className="rounded-3xl bg-white border border-slate-200/90 shadow-2xl shadow-indigo-950/10 p-7 sm:p-9 text-slate-800">
       
-      {/* 1. Header con Logo de ControlTotal */}
+      {/* 1. Header con Logo de ControlTotal en marco blanco y suave */}
       <div className="flex flex-col items-center text-center space-y-2 mb-7">
         <Link href="/" className="inline-flex items-center gap-2.5 group mb-1">
           <div className="relative h-12 w-12 transition-transform group-hover:scale-105">
@@ -111,7 +149,7 @@ export default function LoginPage() {
         <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
           {isResetMode 
             ? "Ingresa tu correo para enviarte las instrucciones de restablecimiento"
-            : "Ingresa tus credenciales para acceder a tu panel financiero"}
+            : "Ingresa tus credenciales para acceder al sistema"}
         </p>
       </div>
 
@@ -187,7 +225,7 @@ export default function LoginPage() {
           )}
         </div>
       ) : (
-        /* Vista: Login Normal */
+        /* Vista: Login Normal con PIN de Superadmin Integrado */
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-slate-700 block mb-1.5" htmlFor="email">
@@ -201,6 +239,8 @@ export default function LoginPage() {
                 type="email"
                 required
                 disabled={loading}
+                value={inputEmail}
+                onChange={(e) => setInputEmail(e.target.value)}
                 placeholder="m@ejemplo.com"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition-all"
               />
@@ -236,6 +276,36 @@ export default function LoginPage() {
               />
             </div>
           </div>
+
+          {/* Campo PIN Superadmin: Se muestra automáticamente si es Superadmin o si se activa */}
+          {isSuperAdminEmail && (
+            <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200/90 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-purple-900 flex items-center gap-1.5" htmlFor="pin">
+                  <KeyRound className="h-3.5 w-3.5 text-purple-600" />
+                  <span>PIN de Autorización Superadmin</span>
+                </label>
+                <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full border border-purple-200">
+                  4 dígitos
+                </span>
+              </div>
+              <div className="relative">
+                <input
+                  id="pin"
+                  name="pin"
+                  type="password"
+                  maxLength={6}
+                  value={superadminPin}
+                  onChange={(e) => setSuperadminPin(e.target.value)}
+                  placeholder="•••• (PIN inicial: 2026)"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white border border-purple-200 text-sm font-mono tracking-widest text-slate-900 placeholder:text-purple-300 placeholder:tracking-normal focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition-all shadow-sm"
+                />
+              </div>
+              <p className="text-[10px] text-purple-600 font-medium leading-tight">
+                Autorización directa: Serás redirigido directamente a la Consola de Administración.
+              </p>
+            </div>
+          )}
 
           {error && (
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">

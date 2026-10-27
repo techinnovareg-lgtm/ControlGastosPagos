@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase-server"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
+import { DashboardFooter } from "@/components/layout/footer"
 import { GlobalCacheProvider } from "@/components/providers/cache-provider"
 
 export default async function DashboardLayout({
@@ -54,7 +54,7 @@ export default async function DashboardLayout({
                 {children}
               </div>
             </div>
-            <Footer />
+            <DashboardFooter />
           </main>
         </div>
       </GlobalCacheProvider>

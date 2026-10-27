@@ -25,7 +25,7 @@ import {
   Pie,
   Cell
 } from "recharts"
-import { CreditCard, Banknote, Landmark, AlertCircle, Loader2, Target, PiggyBank } from "lucide-react"
+import { CreditCard, Banknote, Landmark, AlertCircle, Loader2, Target, PiggyBank, ShieldAlert, ArrowRight } from "lucide-react"
 import { usePayments } from "@/hooks/usePayments"
 import { useIncomes } from "@/hooks/useIncomes"
 import { useAccounts } from "@/hooks/useAccounts"
@@ -54,6 +54,19 @@ const itemVariants: Variants = {
 
 export default function DashboardPage() {
   const supabase = createClient()
+  const [isSuper, setIsSuper] = React.useState(false)
+
+  React.useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (
+        session?.user?.email === "tech.innova.reg@gmail.com" || 
+        session?.user?.email === "carlos.amambal@gmail.com"
+      ) {
+        setIsSuper(true)
+      }
+    })
+  }, [supabase])
+
   const { payments, loading: loadingPayments } = usePayments()
   const { incomes, loading: loadingIncomes } = useIncomes()
   const { accounts, loading: loadingAccounts } = useAccounts()
@@ -182,6 +195,19 @@ export default function DashboardPage() {
       animate="show" 
       className="space-y-6 pb-20 overflow-x-hidden"
     >
+      {isSuper && (
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-purple-50 border border-purple-200/90 text-xs shadow-sm">
+          <div className="flex items-center gap-2 text-purple-900 font-bold">
+            <ShieldAlert className="h-4 w-4 text-purple-600 shrink-0" />
+            <span>Consola Superadmin: Estás visualizando tu cuenta personal de control de gastos.</span>
+          </div>
+          <Link href="/dashboard/admin" className="font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 shrink-0 bg-white px-3 py-1.5 rounded-xl border border-purple-200 shadow-sm transition-colors">
+            <span>Ir a Administración de Cuentas</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </motion.div>
+      )}
+
       <motion.div variants={itemVariants} className="flex flex-col space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Resumen Financiero</h2>
         <p className="text-muted-foreground">Tu estado general de cuentas y ahorros este mes.</p>

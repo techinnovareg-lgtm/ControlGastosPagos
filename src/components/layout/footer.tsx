@@ -184,3 +184,38 @@ export function Footer() {
     </footer>
   )
 }
+
+
+// ==============================================================
+// BANNER COMPACTO Y SIMPLE PARA EL DASHBOARD
+// ==============================================================
+export function DashboardFooter() {
+  return (
+    <footer className="w-full border-t border-slate-200/80 bg-white/95 backdrop-blur-sm py-2 px-4 sm:px-6 mt-auto">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-slate-700">Tech Innova</span>
+          <span className="text-slate-300">•</span>
+          <span>ControlTotal v2.5</span>
+          <span className="text-slate-300">•</span>
+          <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Nube Segura
+          </span>
+        </div>
+        
+        <div className="flex items-center gap-4 text-slate-500">
+          <a href="mailto:tech.innova.reg@gmail.com" className="hover:text-indigo-600 transition-colors">
+            Soporte: tech.innova.reg@gmail.com
+          </a>
+          <span className="text-slate-300">•</span>
+          <a href="https://tech-innova.online" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition-colors">
+            tech-innova.online
+          </a>
+          <span className="text-slate-300">•</span>
+          <span>© 2026</span>
+        </div>
+      </div>
+    </footer>
+  )
+}
